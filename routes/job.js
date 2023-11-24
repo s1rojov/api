@@ -11,4 +11,16 @@ router.get("/", async (req, res) => {
   }
 });
 
+// add new job
+router.post("/", async (req, res) => {
+  try {
+    const newJob = await pool.query(
+      `insert into job (name) values ($1) returning *`,
+      [req.body.name]
+    );
+    res.status(201).json('Created successfully');
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 module.exports = router;
