@@ -23,9 +23,49 @@ router.post("/", async (req, res) => {
       [fname, sname, birthday, email, phone, job_id]
     );
 
-    res.status(201).json('Created successfully');
+    res.status(201).json(newEmployee.rows[0]);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+
+// update employee
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { fname, sname, birthday, email, phone, job_id } = req.body;
+    const oldEmployee = await pool.query('SELECT * FROM employee WHERE id = $1', [id]);
+    const updatedEmployee = await pool.query(
+      `
+        UPDATE employee SET fname = $1, sname = $2, birthday = $3, email = $4, phone = $5, job_id = $6 WHERE id = $7 RETURNING *
+      `,
+      [
+        fname || oldEmployee.rows[0].fname,
+        sname || oldEmployee.rows[0].sname,
+        birthday || oldEmployee.rows[0].birthday,
+        email || oldEmployee.rows[0].email,
+        phone || oldEmployee.rows[0].phone,
+        job_id || oldEmployee.rows[0].job_id,
+        id
+      ]
+    );
+
+    res.status(200).json(updatedEmployee.rows[0]);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Delete employee
+
+router.delete('/:id', async (req, res) => {
+  try {
+    await pool.query('delete from employee where id = $1', [req.params.id])
+    res.status(200).json('Deleted successfully')
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+})
+
+
 module.exports = router;
