@@ -5,7 +5,7 @@ const router = Router();
 // get all employees
 router.get("/", async (req, res) => {
   try {
-    const employees = await pool.query("select * from employee");
+    const employees = await pool.query("select e.id, e.fname,e.sname,e.birthday, e.email, e.phone,j.name from employee e inner join job j on  e.job_id = j.id");
     res.status(200).json(employees.rows);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -23,7 +23,7 @@ router.post("/", async (req, res) => {
       [fname, sname, birthday, email, phone, job_id]
     );
 
-    res.status(201).json(newEmployee.rows[0]);
+    res.status(201).json('Created successfully');
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
