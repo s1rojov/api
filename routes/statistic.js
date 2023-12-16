@@ -4,8 +4,8 @@ const router = Router();
 
 router.get('/', async (req, res) => {
     try {
-        const departmentStatistic = await pool.query('SELECT d.name AS department_name, COUNT(e.id) AS employee_count FROM department d LEFT JOIN employee e ON d.id = e.job_id GROUP BY d.id;')
-        const jobStatistic = await pool.query('SELECT j.name AS job_name,COUNT(e.id) AS employee_count FROM job j LEFT JOIN employee e ON j.id = e.job_id GROUP BY j.id;')
+        const departmentStatistic = await pool.query('SELECT d.name AS department_name, COUNT(e.id) AS employee_count FROM department d INNER JOIN employee e ON d.id = e.department_id GROUP BY d.id')
+        const jobStatistic = await pool.query('SELECT j.name AS job_name,COUNT(e.id) AS employee_count FROM job j INNER JOIN employee e ON j.id = e.job_id GROUP BY j.id')
 
 
         let departmentNames = []
