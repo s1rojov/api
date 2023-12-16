@@ -13,9 +13,8 @@ CREATE TABLE job(
     name VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE users(
-    id BIGSERIAL NOT NULL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
+create table department(
+    id bigserial not null primary key,
+    name varchar(255) not null,
+    code varchar(255) not null
 )

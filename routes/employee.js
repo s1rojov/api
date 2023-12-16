@@ -5,7 +5,7 @@ const router = Router();
 // get all employees
 router.get("/", async (req, res) => {
   try {
-    const employees = await pool.query("select e.id, e.fname,e.sname,e.birthday, e.email, e.phone,j.name from employee e inner join job j on  e.job_id = j.id");
+    const employees = await pool.query("SELECT employee.id AS id,employee.fname AS fname,employee.sname AS sname,employee.birthday AS birthday,employee.email AS email,employee.phone AS phone,job.name AS job_name,department.name AS department_name FROM employee JOIN job ON employee.job_id = job.id JOIN department ON employee.department_id = department.id");
     res.status(200).json(employees.rows);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -15,12 +15,12 @@ router.get("/", async (req, res) => {
 // add new employee
 router.post("/", async (req, res) => {
   try {
-    const { fname, sname, birthday, email, phone, job_id } = req.body;
+    const { fname, sname, birthday, email, phone, job_id, department_id } = req.body;
     const newEmployee = pool.query(
       `
-        insert into employee (fname, sname, birthday, email, phone, job_id) values ($1, $2, $3, $4, $5, $6) returning *
+        insert into employee (fname, sname, birthday, email, phone, job_id, department_id) values ($1, $2, $3, $4, $5, $6, $7) returning *
     `,
-      [fname, sname, birthday, email, phone, job_id]
+      [fname, sname, birthday, email, phone, job_id, department_id]
     );
 
     res.status(201).json('Created successfully');
@@ -33,11 +33,11 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { fname, sname, birthday, email, phone, job_id } = req.body;
+    const { fname, sname, birthday, email, phone, job_id, department_id } = req.body;
     const oldEmployee = await pool.query('SELECT * FROM employee WHERE id = $1', [id]);
     const updatedEmployee = await pool.query(
       `
-        UPDATE employee SET fname = $1, sname = $2, birthday = $3, email = $4, phone = $5, job_id = $6 WHERE id = $7 RETURNING *
+        UPDATE employee SET fname = $1, sname = $2, birthday = $3, email = $4, phone = $5, job_id = $6, department_id=$7 WHERE id = $8 RETURNING *
       `,
       [
         fname || oldEmployee.rows[0].fname,
@@ -46,6 +46,7 @@ router.put("/:id", async (req, res) => {
         email || oldEmployee.rows[0].email,
         phone || oldEmployee.rows[0].phone,
         job_id || oldEmployee.rows[0].job_id,
+        department_id || oldEmployee.rows[0].department_id,
         id
       ]
     );
